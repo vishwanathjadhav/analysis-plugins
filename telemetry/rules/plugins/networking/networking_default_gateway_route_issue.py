@@ -45,7 +45,6 @@ def get_active_interfaces(nics):
 
 @condition(RouteDevices)
 def no_default_route(routes):
-    import pdb; pdb.set_trace()
     if not routes.defaults:
         return True
 
