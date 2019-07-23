@@ -1,0 +1,97 @@
+#+TITLE: Using Insights Core Framework
+#+DATE: DevConf.in - 2019, Bengaluru, India
+#+Author: Sachin Patil, Vishwanath Jadhav
+#+OPTIONS: texht:t
+#+OPTIONS: toc:nil email:nil
+#+LATEX_CLASS: article
+#+LATEX_CLASS_OPTIONS:
+#+LATEX_HEADER_EXTRA:
+#+LaTeX_HEADER: \usepackage[a4paper, total={7in, 10in}]{geometry}
+#+LaTeX_HEADER: \usepackage[utf8]{inputenc}
+#+LaTeX_HEADER: \usepackage[english]{babel}
+
+#+LaTeX_HEADER: \usepackage{minted}
+#+LaTeX_HEADER: \usemintedstyle{emacs}
+
+#+LaTeX_HEADER: \renewcommand{\familydefault}{\rmdefault}
+#+LaTeX_HEADER: \usepackage[usenames, dvipsnames]{xcolor}
+#+LaTeX_HEADER: \pagenumbering{arabic}
+#+LaTeX_HEADER: \usepackage{hyperref}
+#+LaTeX_HEADER: \hypersetup{colorlinks=true, linkcolor=blue, filecolor=magenta, urlcolor=cyan}
+#+LaTeX_HEADER: \urlstyle{same}
+#+LaTeX_HEADER: \usepackage{attachfile}
+
+
+** Prerequisites
+   - GNU/Linux
+   - Python 3.6
+     - Fedora
+       #+BEGIN_SRC shell
+         $ sudo dnf install python36
+       #+END_SRC
+
+     - CentOS
+       #+BEGIN_SRC shell
+	 $ sudo yum install epel-release centos-release-scl
+	 $ sudo scl enable rh-python36 bash
+       #+END_SRC
+
+     - Ubuntu
+       #+BEGIN_SRC shell
+	 $ sudo apt-get install python3-venv
+	 $ pip install wheel
+       #+END_SRC
+
+   - =git=
+   - =sos-report=
+     - Fedora
+       #+BEGIN_SRC shell
+         $ sudo dnf install sos
+       #+END_SRC
+
+     - CentOS/RedHat
+       #+BEGIN_SRC shell
+         $ sudo yum install sos
+       #+END_SRC
+
+     - Ubuntu
+       #+BEGIN_SRC shell
+         $ sudo apt-get install sosreport
+       #+END_SRC
+
+** Repositories
+   - Insights Core Framework: Data collection & processing framework used by Red
+     Hat Insights
+     #+BEGIN_SRC shell
+       $ mkdir ~/insights
+       $ cd ~/insights
+       # Clone the Insights Core repo
+       $ git clone https://github.com/RedHatInsights/insights-core.git
+     #+END_SRC
+
+   - Plugins/Rules repo
+     #+BEGIN_SRC shell
+       # Clone the rules repo
+       $ git clone https://github.com/vishwanathjadhav/analysis-plugins.git
+     #+END_SRC
+
+** Setup
+   - Setting up a development environment
+     #+BEGIN_SRC shell
+       $ python3.6 -m venv .
+       $ source bin/activate
+       $ pip install -e insights-core[develop]
+     #+END_SRC
+
+** Generating a sos archive
+   #+BEGIN_SRC shell
+     $ sudo sosreport
+
+     # Below command is recommended for this demo.
+     $ sudo sosreport -o ssh,systemd,release
+   #+END_SRC
+
+** Test the rule against sos archive
+   #+BEGIN_SRC shell
+     $ insighst-run -p  ~/path/to/sos-archive
+   #+END_SRC
