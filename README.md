@@ -30,8 +30,6 @@ Demo setup for DevConf(Understand how to use insights-core framework)
    # CLONE AND SETUP analysis-plugins
    ~]$ git clone git@github.com:vishwanathjadhav/analysis-plugins.git
    ~]$ cd analysis-plugins
-   ~]$ pip install -e .[develop]
-   ~]$ py.test -svk networking_default_gateway_route_issue
 
    # GENERATE SOS-REPORTS
    ~]$ sudo sosreport
@@ -69,9 +67,6 @@ Demo setup for DevConf(Understand how to use insights-core framework)
    # CLONE AND SETUP analysis-plugins
    ~]$ cd ../
    ~]$ git clone git@github.com:vishwanathjadhav/analysis-plugins.git
-   ~] cd analysis-plugins
-   ~]$ pip install -e .[develop]
-   ~]$ py.test -svk networking_default_gateway_route_issue
    
    # GENERATE SOS-REPORTS 
    ~]$ sudo sosreport
@@ -104,8 +99,6 @@ Demo setup for DevConf(Understand how to use insights-core framework)
    # CLONE AND SETUP analysis-plugins
    ~]$ cd ../
    ~]$ git clone git@github.com:vishwanathjadhav/analysis-plugins.git
-   ~]$ pip install -e .[develop]
-   ~]$ py.test -svk networking_default_gateway_route_issue
    
    # GENERATE SOS-REPORTS
    ~]$ sudo sosreport
