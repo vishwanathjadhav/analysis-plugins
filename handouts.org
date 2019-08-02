@@ -1,0 +1,297 @@
+#+TITLE: [Handout] Contributing to the Insights Core Framework
+#+DATE: DevConf.in 2019, Bangalore, India
+#+Author: Sachin Patil, Vishwanath Jadhav
+#+EMAIL: psachin@redhat.com, vjadhav@redhat.com
+#+OPTIONS: texht:t
+#+OPTIONS: toc:nil email:t
+#+LATEX_CLASS: article
+#+LATEX_CLASS_OPTIONS:
+#+LATEX_HEADER_EXTRA:
+#+LaTeX_HEADER: \usepackage[a4paper, total={7in, 10in}]{geometry}
+#+LaTeX_HEADER: \usepackage[utf8]{inputenc}
+#+LaTeX_HEADER: \usepackage[english]{babel}
+
+#+LaTeX_HEADER: \usepackage{minted}
+#+LaTeX_HEADER: \usemintedstyle{emacs}
+
+#+LaTeX_HEADER: \renewcommand{\familydefault}{\rmdefault}
+#+LaTeX_HEADER: \usepackage[usenames, dvipsnames]{xcolor}
+#+LaTeX_HEADER: \pagenumbering{arabic}
+#+LaTeX_HEADER: \usepackage{hyperref}
+#+LaTeX_HEADER: \hypersetup{colorlinks=true, linkcolor=blue, filecolor=magenta, urlcolor=cyan}
+#+LaTeX_HEADER: \urlstyle{same}
+#+LaTeX_HEADER: \usepackage{attachfile}
+
+
+** Prerequisites
+   - GNU/Linux
+   - Python 3.6
+     - Fedora
+       #+BEGIN_SRC shell
+         $ sudo dnf install python36
+       #+END_SRC
+
+     - CentOS
+       #+BEGIN_SRC shell
+	 $ sudo yum install epel-release centos-release-scl
+	 $ sudo scl enable rh-python36 bash
+       #+END_SRC
+
+     - Ubuntu
+       #+BEGIN_SRC shell
+	 $ sudo apt-get install python3-venv
+	 $ pip install wheel
+       #+END_SRC
+
+   - =git=
+   - =sos-report=
+     - Fedora
+       #+BEGIN_SRC shell
+         $ sudo dnf install sos
+       #+END_SRC
+
+     - CentOS/RedHat
+       #+BEGIN_SRC shell
+         $ sudo yum install sos
+       #+END_SRC
+
+     - Ubuntu
+       #+BEGIN_SRC shell
+         $ sudo apt-get install sosreport
+       #+END_SRC
+
+** Setup
+   - Setting up a development environment
+     #+BEGIN_SRC shell
+       $ mkdir ~/insights
+       $ cd ~/insights
+       # Clone the Insights Core repo
+       $ git clone https://github.com/RedHatInsights/insights-core.git
+       $ python3.6 -m venv .
+       $ source bin/activate
+       $ pip install -e insights-core[develop]
+
+       # Clone the plugin repo
+       $ git clone https://github.com/vishwanathjadhav/analysis-plugins.git
+     #+END_SRC
+
+** Sos-report[fn:sr]
+   - Generating an Sos archive
+     #+BEGIN_SRC shell
+       $ sudo sosreport
+
+       # Below command is recommended for this demo.
+       $ sudo sosreport -o ssh,systemd,release
+     #+END_SRC
+
+** Specs[fn:specs]
+   - Raw data in the form of file-content or command output.
+     #+BEGIN_SRC shell -n
+       # File
+       $ cat /etc/lsb-release
+       DISTRIB_ID=Ubuntu
+       DISTRIB_RELEASE=18.04
+       DISTRIB_CODENAME=bionic
+       DISTRIB_DESCRIPTION="Ubuntu 18.04.2 LTS"
+
+       # Command
+       $ uname -a
+       Linux foobar 5.0.17-200.fc29.x86_64 #1 SMP Mon May...2019 x86_64...GNU/Linux
+     #+END_SRC
+
+   - Define a Spec
+     #+BEGIN_SRC python -n
+       from insights.specs import Specs
+       from insights.core.spec_factory import simple_file
+
+
+       class SosSpecs(Specs):
+	   # sos-report/etc/lsb-release
+	   lsb_release = simple_file("etc/lsb-release")
+     #+END_SRC
+
+** Parser[fn:parser]
+   - It structures the raw data(from specs) for further analysis.
+   - Example(structured data from /etc/lsb-release):
+     #+BEGIN_SRC python
+       {
+	   'product': 'Ubuntu',
+	   'version': '18.04'
+       }
+     #+END_SRC
+   - Define a parser
+     #+BEGIN_SRC python -n
+       from insights import Parser, parser
+       from insights.parsers import split_kv_pairs
+
+
+       @parser(SosSpecs.lsb_release)
+       class LsbRelease(Parser):
+	   def parse_content(self, content):
+	       _content = split_kv_pairs(content)
+	       self.data = {
+		   'product': _content['DISTRIB_ID'],
+		   'version': _content['DISTRIB_RELEASE']
+	       }
+
+	   @property
+	   def product(self):
+	       return self.data['product']
+
+	   @property
+	   def version(self):
+	       return self.data['version']
+     #+END_SRC
+
+** Plugin/Rule
+*** Conditions[fn:condition]
+    - Analysis the data from the parser
+      #+BEGIN_SRC python -n
+	from insights.core.plugins import condition
+	from insights.parsers.ssh import SshDConfig
+	from insights.parsers.systemd.unitfiles import ListUnits
+	from insights.parsers.redhat_release import RedhatRelease
+
+	@condition(SshDConfig)
+	def check_permit_root_login(sshd):
+	    """Return True if 'PermitRootLogin yes' in /etc/ssh/sshd_config.
+	    """
+	    if sshd.get('permitrootlogin'):
+		return sshd.get_values('permitrootlogin')[0] == 'yes'
+
+
+	@condition(ListUnits)
+	def is_sshd_running(units):
+	    """ Return True if ``sshd.service`` is running.
+	    """
+	    return units.is_running('sshd.service') or units.is_running('ssh.service')
+
+
+	@condition([RedhatRelease, LsbRelease])
+	def get_release(redhat_release, lsb_release):
+	    """Get the product name.
+
+	    RedhatRelease: Data from /etc/redhat-release
+	    LsbRelease: Data from /etc/lsb-release
+	    """
+	    if redhat_release:
+		return redhat_release.product
+	    if lsb_release:
+		return lsb_release.product
+       #+END_SRC
+
+*** The response[fn:rule]
+    - The =@rule= will have a final logic which will decide the response of the
+      plugin.
+      #+BEGIN_SRC python -n
+	from insights.core.plugins import make_fail, make_pass, rule
+
+
+	@rule(check_permit_root_login, is_sshd_running, get_release)
+	def report(root_login, sshd, release):
+	    if sshd and release:
+		if root_login:
+		    # The issue is detected.
+		    return make_fail('SSHD_ROOT_LOGIN_PERMITTED',
+				     os=release)
+		# The issue does not exist.
+		return make_pass('SSHD_ROOT_LOGIN_DISABLED',
+				 os=release)
+
+      #+END_SRC
+
+*** Embedded content[fn:ec]
+    - Use the =CONTENT= attribute to render the response
+      #+BEGIN_SRC python -n
+	fail_message = """
+	The root user can login on this {{os}} host because the 'PermitRootLogin' is set
+	to 'yes' in /etc/ssh/sshd_config.
+
+	It is recommended to set 'PermitRootLogin' to 'prohibit-password',
+	'forced-commands-only' or 'no'.
+
+	Please refer the manpage of SSHD_CONFIG for more info:
+	$ man 5 ssh_config
+	"""
+
+	pass_message = """
+	The root user cannot login on this {{os}} host.
+	"""
+
+	CONTENT = {
+	    'SSHD_ROOT_LOGIN_PERMITTED': fail_message,
+	    'SSHD_ROOT_LOGIN_DISABLED': pass_message
+	}
+      #+END_SRC
+
+** Analyzing an sos archive
+   - Run the plugin against the sos-report using:
+     #+BEGIN_SRC shell
+       $ insights-run -p your_plugin.py /path/to/sos-report.tar.xz
+     #+END_SRC
+
+
+** Debugging[fn:inspect]
+   - Specs
+     #+BEGIN_SRC shell -n
+       $ insights-inspect insights.specs.default.DefaultSpecs.redhat_release sosreport_xxx.tar.xz
+
+       IPython Console Usage Info:
+
+       Enter 'redhat_release.' and tab to get a list of properties
+       Example:
+       In [1]: redhat_release.<property_name>
+       Out[1]: <property value>
+
+       To exit ipython enter 'exit' and hit enter or use 'CTL D'
+
+       Starting IPython Interpreter Now
+
+       In [1]: redhat_release.content
+       Out[1]: ['Fedora release 29 (Twenty Nine)']
+
+       In [2]: redhat_release.path
+       Out[2]: '/tmp/insights-rdhi53c6/sosreport_fedora_sshd_root_login/etc/redhat-release'
+
+       In [3]: redhat_release.file_name
+       Out[3]: 'redhat-release'
+     #+END_SRC
+
+   - Parser:
+     #+BEGIN_SRC shell -n
+       $ insights-inspect insights.parsers.redhat_release.RedhatRelease sosreport_xxx.tar.xz
+
+       IPython Console Usage Info:
+
+       Enter 'RedhatRelease.' and tab to get a list of properties
+       Example:
+       In [1]: RedhatRelease.<property_name>
+       Out[1]: <property value>
+
+       To exit ipython enter 'exit' and hit enter or use 'CTL D'
+
+       Starting IPython Interpreter Now
+
+       In [1]: RedhatRelease.raw
+       Out[1]: 'Fedora release 29 (Twenty Nine)'
+
+       In [2]: RedhatRelease.parsed
+       Out[2]: {'product': 'Fedora', 'version': '29', 'code_name': 'Twenty Nine'}
+
+       In [3]: RedhatRelease.product
+       Out[3]: 'Fedora'
+
+       In [4]: RedhatRelease.version
+       Out[4]: '29'
+     #+END_SRC
+
+** End[fn:end]
+** Footnotes
+[fn:sr] https://github.com/sosreport/sos/wiki#for-users
+[fn:specs] https://insights-core.readthedocs.io/en/latest/api.html#specification-factories
+[fn:parser] https://insights-core.readthedocs.io/en/latest/api.html#parsers
+[fn:condition] https://insights-core.readthedocs.io/en/latest/api_index.html?highlight=%40condition#insights.core.plugins.condition
+[fn:rule] https://insights-core.readthedocs.io/en/latest/api.html?highlight=%40rule#rule-plugins
+[fn:ec] https://insights-core.readthedocs.io/en/latest/embedded_content.html
+[fn:inspect] https://insights-core.readthedocs.io/en/latest/manpages/insights-inspect.html
+[fn:end] Made with Love, LaTeX and GNU Emacs
