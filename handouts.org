@@ -145,7 +145,7 @@
 
 ** Plugin/Rule
 *** Conditions[fn:condition]
-    - Analysis the data from the parser
+    - Analyzing the data from the parser
       #+BEGIN_SRC python -n
 	from insights.core.plugins import condition
 	from insights.parsers.ssh import SshDConfig
@@ -224,7 +224,7 @@
 	}
       #+END_SRC
 
-** Analyzing an sos archive
+** Investigating the sos-report[fn:analysis]
    - Run the plugin against the sos-report using:
      #+BEGIN_SRC shell
        $ insights-run -p your_plugin.py /path/to/sos-report.tar.xz
@@ -293,5 +293,6 @@
 [fn:condition] https://insights-core.readthedocs.io/en/latest/api_index.html?highlight=%40condition#insights.core.plugins.condition
 [fn:rule] https://insights-core.readthedocs.io/en/latest/api.html?highlight=%40rule#rule-plugins
 [fn:ec] https://insights-core.readthedocs.io/en/latest/embedded_content.html
+[fn:analysis] https://insights-core.readthedocs.io/en/latest/manpages/insights-run.html
 [fn:inspect] https://insights-core.readthedocs.io/en/latest/manpages/insights-inspect.html
 [fn:end] Made with Love, LaTeX and GNU Emacs
