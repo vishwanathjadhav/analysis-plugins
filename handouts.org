@@ -20,8 +20,21 @@
 #+LaTeX_HEADER: \usepackage{hyperref}
 #+LaTeX_HEADER: \hypersetup{colorlinks=true, linkcolor=blue, filecolor=magenta, urlcolor=cyan}
 #+LaTeX_HEADER: \urlstyle{same}
-#+LaTeX_HEADER: \usepackage{attachfile}
 
+
+This handout will guide you in developing and understanding the parser and the
+rule(plugin) using the *Insights Core Framework*. The rule uses the simple logic
+to analyze the sosreport and verify if the =root= login is enabled in
+=/etc/ssh/sshd_config= file. If the =root= is permitted to login to the SSH
+server, the rule will respond with the distro name(product) along with the
+resolution.
+
+Start by installing the pre-requisites and creating the Python Virtual
+environment needed for developing & testing a rule. Once the virtual environment
+is ready, create an empty Python file with any name(say =my_plugin.py=) and
+start adding the code snippets marked as *CODE* in the python file to develop a
+complete rule. You can literally copy-paste the code snippets to get the working
+rule.
 
 ** Prerequisites
    - GNU/Linux
@@ -43,7 +56,7 @@
 	 $ pip install wheel
        #+END_SRC
 
-   - =git=
+   - =git=[fn:git]
    - =sos-report=
      - Fedora
        #+BEGIN_SRC shell
@@ -71,7 +84,7 @@
        $ source bin/activate
        $ pip install -e insights-core[develop]
 
-       # Clone the plugin repo
+       # [Optional] Clone the plugin repo
        $ git clone https://github.com/vishwanathjadhav/analysis-plugins.git
      #+END_SRC
 
@@ -94,33 +107,40 @@
        DISTRIB_CODENAME=bionic
        DISTRIB_DESCRIPTION="Ubuntu 18.04.2 LTS"
 
-       # Command
+       # Command output
        $ uname -a
        Linux foobar 5.0.17-200.fc29.x86_64 #1 SMP Mon May...2019 x86_64...GNU/Linux
      #+END_SRC
 
-   - Define a Spec
-     #+BEGIN_SRC python -n
+   - *CODE*: Define a Spec
+     #+BEGIN_SRC python -n :tangle my_plugin.py
+       """The specs is where you define a path to the file(configuration, log etc.)
+       having the content or the command output within the sos-report. The valid path
+       can also be a file-system path such as ``/var/log/messages``.
+       """
        from insights.specs import Specs
        from insights.core.spec_factory import simple_file
 
 
        class SosSpecs(Specs):
-	   # sos-report/etc/lsb-release
+	   # sos-archive/etc/lsb-release.
+
+	   # You can safely skip the 'sos-archive/' as the rule will be run against an
+	   # archive.
 	   lsb_release = simple_file("etc/lsb-release")
      #+END_SRC
 
 ** Parser[fn:parser]
    - It structures the raw data(from specs) for further analysis.
-   - Example(structured data from /etc/lsb-release):
+   - Example(structured data of =/etc/lsb-release= returned by the parser):
      #+BEGIN_SRC python
        {
 	   'product': 'Ubuntu',
 	   'version': '18.04'
        }
      #+END_SRC
-   - Define a parser
-     #+BEGIN_SRC python -n
+   - *CODE*: Define a parser
+     #+BEGIN_SRC python -n :tangle my_plugin.py
        from insights import Parser, parser
        from insights.parsers import split_kv_pairs
 
@@ -145,8 +165,13 @@
 
 ** Plugin/Rule
 *** Conditions[fn:condition]
-    - Analyzing the data from the parser
-      #+BEGIN_SRC python -n
+    - *CODE*: Analyzing the data from the parser
+      #+BEGIN_SRC python -n :tangle my_plugin.py
+	"""The (structured)data from the parsers is analyzed using the ``@condition`` &
+	``@incident`` decorators. The function decorated with the ``@condition`` should
+	return the value which will be used by the ``@rule`` to finally bind all the
+	rule logic.
+	"""
 	from insights.core.plugins import condition
 	from insights.parsers.ssh import SshDConfig
 	from insights.parsers.systemd.unitfiles import ListUnits
@@ -169,10 +194,10 @@
 
 	@condition([RedhatRelease, LsbRelease])
 	def get_release(redhat_release, lsb_release):
-	    """Get the product name.
+	    """Return the product name.
 
-	    RedhatRelease: Data from /etc/redhat-release
-	    LsbRelease: Data from /etc/lsb-release
+	    RedhatRelease will parse the data from ``/etc/redhat-release``
+	    LsbRelease will parse the data from ``/etc/lsb-release``
 	    """
 	    if redhat_release:
 		return redhat_release.product
@@ -181,9 +206,23 @@
        #+END_SRC
 
 *** The response[fn:rule]
-    - The =@rule= will have a final logic which will decide the response of the
+    - *CODE*: The =@rule= will have a final logic which will decide the response of the
       plugin.
-      #+BEGIN_SRC python -n
+      #+BEGIN_SRC python -n :tangle my_plugin.py
+	"""The function decorated with the ``@rule`` decorator is where all the logic to
+	detect an issue exist. The logic for this rule is as follows:
+
+	Logic:
+	1. check_permit_root_login
+	2. is_sshd_running
+	3. get_release
+
+	if (2 & 3):
+	    if 1:
+		# The root user login is permitted
+	    # The root user login is disabled
+
+	"""
 	from insights.core.plugins import make_fail, make_pass, rule
 
 
@@ -201,8 +240,8 @@
       #+END_SRC
 
 *** Embedded content[fn:ec]
-    - Use the =CONTENT= attribute to render the response
-      #+BEGIN_SRC python -n
+    - *CODE* Use the =CONTENT= attribute to render the response
+      #+BEGIN_SRC python -n :tangle my_plugin.py
 	fail_message = """
 	The root user can login on this {{os}} host because the 'PermitRootLogin' is set
 	to 'yes' in /etc/ssh/sshd_config.
@@ -227,11 +266,48 @@
 ** Investigating the sos-report[fn:analysis]
    - Run the plugin against the sos-report using:
      #+BEGIN_SRC shell
-       $ insights-run -p your_plugin.py /path/to/sos-report.tar.xz
+       $ insights-run -p my_plugin.py /path/to/sos-report.tar.xz
+     #+END_SRC
+
+   - Sample output
+     #+BEGIN_SRC text -n
+       $ insights-run -p check_ssh_root_login.py sosreport_fedora_sshd_root_login.tar.xz
+       ---------
+       Progress:
+       ---------
+       F
+
+       --------------
+       Rules Executed
+       --------------
+       [FAIL] check_ssh_root_login.report
+       ----------------------------------
+
+       The root user can login on this Fedora host because the 'PermitRootLogin' is set
+       to 'yes' in /etc/ssh/sshd_config.
+
+       It is recommended to set 'PermitRootLogin' to 'prohibit-password',
+       'forced-commands-only' or 'no'.
+
+       Please refer the manpage of SSHD_CONFIG for more info:
+       $ man 5 ssh_config
+
+
+       ----------------------
+       Rule Execution Summary
+       ----------------------
+       Passed      : 0
+       Failed      : 1
+       Info        : 0
+       Missing Deps: 0
+       Fingerprint : 0
+       Metadata    : 0
+       Metadata Key: 0
+       Exceptions  : 0
      #+END_SRC
 
 
-** Debugging[fn:inspect]
+** [WIP]Debugging[fn:inspect]
    - Specs
      #+BEGIN_SRC shell -n
        $ insights-inspect insights.specs.default.DefaultSpecs.redhat_release sosreport_xxx.tar.xz
@@ -285,8 +361,9 @@
        Out[4]: '29'
      #+END_SRC
 
-** End[fn:end]
+** End[fn:end][fn:test][fn:edu]
 ** Footnotes
+[fn:git] https://git-scm.com/book/en/v2
 [fn:sr] https://github.com/sosreport/sos/wiki#for-users
 [fn:specs] https://insights-core.readthedocs.io/en/latest/api.html#specification-factories
 [fn:parser] https://insights-core.readthedocs.io/en/latest/api.html#parsers
@@ -295,4 +372,6 @@
 [fn:ec] https://insights-core.readthedocs.io/en/latest/embedded_content.html
 [fn:analysis] https://insights-core.readthedocs.io/en/latest/manpages/insights-run.html
 [fn:inspect] https://insights-core.readthedocs.io/en/latest/manpages/insights-inspect.html
-[fn:end] Made with Love, LaTeX and GNU Emacs
+[fn:end] Made with Love, LaTeX and GNU Emacs.
+[fn:test] The code snippets are tested on /Fedora 29/ & /Ubuntu 10.04/.
+[fn:edu] For Education purpose only.

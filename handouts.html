@@ -1,0 +1,767 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2019-09-16 Mon 14:54 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>[Handout] Contributing to the Insights Core Framework</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Sachin Patil, Vishwanath Jadhav" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">[Handout] Contributing to the Insights Core Framework</h1>
+<p>
+This handout will guide you in developing and understanding the parser and the
+rule(plugin) using the <b>Insights Core Framework</b>. The rule uses the simple logic
+to analyze the sosreport and verify if the <code>root</code> login is enabled in
+<code>/etc/ssh/sshd_config</code> file. If the <code>root</code> is permitted to login to the SSH
+server, the rule will respond with the distro name(product) along with the
+resolution.
+</p>
+
+<p>
+Start by installing the pre-requisites and creating the Python Virtual
+environment needed for developing &amp; testing a rule. Once the virtual environment
+is ready, create an empty Python file with any name(say <code>my_plugin.py</code>) and
+start adding the code snippets marked as <b>CODE</b> in the python file to develop a
+complete rule. You can literally copy-paste the code snippets to get the working
+rule.
+</p>
+
+<div id="outline-container-org837ad4a" class="outline-2">
+<h2 id="org837ad4a"><span class="section-number-2">1</span> Prerequisites</h2>
+<div class="outline-text-2" id="text-1">
+<ul class="org-ul">
+<li>GNU/Linux</li>
+<li>Python 3.6
+<ul class="org-ul">
+<li><p>
+Fedora
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">$ sudo dnf install python36
+</pre>
+</div></li>
+
+<li><p>
+CentOS
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">$ sudo yum install epel-release centos-release-scl
+$ sudo scl enable rh-python36 bash
+</pre>
+</div></li>
+
+<li><p>
+Ubuntu
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">$ sudo apt-get install python3-venv
+$ pip install wheel
+</pre>
+</div></li>
+</ul></li>
+
+<li><code>git</code><sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup></li>
+<li><code>sos-report</code>
+<ul class="org-ul">
+<li><p>
+Fedora
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">$ sudo dnf install sos
+</pre>
+</div></li>
+
+<li><p>
+CentOS/RedHat
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">$ sudo yum install sos
+</pre>
+</div></li>
+
+<li><p>
+Ubuntu
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">$ sudo apt-get install sosreport
+</pre>
+</div></li>
+</ul></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org914c196" class="outline-2">
+<h2 id="org914c196"><span class="section-number-2">2</span> Setup</h2>
+<div class="outline-text-2" id="text-2">
+<ul class="org-ul">
+<li><p>
+Setting up a development environment
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">$ mkdir ~/insights
+$ cd ~/insights
+<span style="color: #73d216;"># </span><span style="color: #73d216;">Clone the Insights Core repo</span>
+$ git clone https://github.com/RedHatInsights/insights-core.git
+$ python3.6 -m venv .
+$ source bin/activate
+$ pip install -e insights-core[develop]
+
+<span style="color: #73d216;"># </span><span style="color: #73d216;">[Optional] Clone the plugin repo</span>
+$ git clone https://github.com/vishwanathjadhav/analysis-plugins.git
+</pre>
+</div></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org452a0b8" class="outline-2">
+<h2 id="org452a0b8"><span class="section-number-2">3</span> Sos-report<sup><a id="fnr.2" class="footref" href="#fn.2">2</a></sup></h2>
+<div class="outline-text-2" id="text-3">
+<ul class="org-ul">
+<li><p>
+Generating an Sos archive
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">$ sudo sosreport
+
+<span style="color: #73d216;"># </span><span style="color: #73d216;">Below command is recommended for this demo.</span>
+$ sudo sosreport -o ssh,systemd,release
+</pre>
+</div></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org3f923b3" class="outline-2">
+<h2 id="org3f923b3"><span class="section-number-2">4</span> Specs<sup><a id="fnr.3" class="footref" href="#fn.3">3</a></sup></h2>
+<div class="outline-text-2" id="text-4">
+<ul class="org-ul">
+<li><p>
+Raw data in the form of file-content or command output.
+</p>
+<div class="org-src-container">
+<pre class="src src-shell"><span class="linenr"> 1: </span><span style="color: #73d216;"># </span><span style="color: #73d216;">File</span>
+<span class="linenr"> 2: </span>$ cat /etc/lsb-release
+<span class="linenr"> 3: </span><span style="color: #fcaf3e;">DISTRIB_ID</span>=Ubuntu
+<span class="linenr"> 4: </span><span style="color: #fcaf3e;">DISTRIB_RELEASE</span>=18.04
+<span class="linenr"> 5: </span><span style="color: #fcaf3e;">DISTRIB_CODENAME</span>=bionic
+<span class="linenr"> 6: </span><span style="color: #fcaf3e;">DISTRIB_DESCRIPTION</span>=<span style="color: #e9b96e;">"Ubuntu 18.04.2 LTS"</span>
+<span class="linenr"> 7: </span>
+<span class="linenr"> 8: </span><span style="color: #73d216;"># </span><span style="color: #73d216;">Command output</span>
+<span class="linenr"> 9: </span>$ uname -a
+<span class="linenr">10: </span>Linux foobar 5.0.17-200.fc29.x86_64 <span style="color: #73d216;">#</span><span style="color: #73d216;">1 SMP Mon May...2019 x86_64...GNU/Linux</span>
+</pre>
+</div></li>
+
+<li><p>
+<b>CODE</b>: Define a Spec
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #e9b96e;">"""The specs is where you define a path to the file(configuration, log etc.)</span>
+<span class="linenr"> 2: </span><span style="color: #e9b96e;">having the content or the command output within the sos-report. The valid path</span>
+<span class="linenr"> 3: </span><span style="color: #e9b96e;">can also be a file-system path such as ``/var/log/messages``.</span>
+<span class="linenr"> 4: </span><span style="color: #e9b96e;">"""</span>
+<span class="linenr"> 5: </span><span style="color: #b4fa70;">from</span> insights.specs <span style="color: #b4fa70;">import</span> Specs
+<span class="linenr"> 6: </span><span style="color: #b4fa70;">from</span> insights.core.spec_factory <span style="color: #b4fa70;">import</span> simple_file
+<span class="linenr"> 7: </span>
+<span class="linenr"> 8: </span>
+<span class="linenr"> 9: </span><span style="color: #b4fa70;">class</span> <span style="color: #8cc4ff;">SosSpecs</span>(Specs):
+<span class="linenr">10: </span>    <span style="color: #73d216;"># </span><span style="color: #73d216;">sos-archive/etc/lsb-release.</span>
+<span class="linenr">11: </span>
+<span class="linenr">12: </span>    <span style="color: #73d216;"># </span><span style="color: #73d216;">You can safely skip the 'sos-archive/' as the rule will be run against an</span>
+<span class="linenr">13: </span>    <span style="color: #73d216;"># </span><span style="color: #73d216;">archive.</span>
+<span class="linenr">14: </span>    <span style="color: #fcaf3e;">lsb_release</span> = simple_file(<span style="color: #e9b96e;">"etc/lsb-release"</span>)
+</pre>
+</div></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org72b851a" class="outline-2">
+<h2 id="org72b851a"><span class="section-number-2">5</span> Parser<sup><a id="fnr.4" class="footref" href="#fn.4">4</a></sup></h2>
+<div class="outline-text-2" id="text-5">
+<ul class="org-ul">
+<li>It structures the raw data(from specs) for further analysis.</li>
+<li><p>
+Example(structured data of <code>/etc/lsb-release</code> returned by the parser):
+</p>
+<div class="org-src-container">
+<pre class="src src-python">{
+    <span style="color: #e9b96e;">'product'</span>: <span style="color: #e9b96e;">'Ubuntu'</span>,
+    <span style="color: #e9b96e;">'version'</span>: <span style="color: #e9b96e;">'18.04'</span>
+}
+</pre>
+</div></li>
+<li><p>
+<b>CODE</b>: Define a parser
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #b4fa70;">from</span> insights <span style="color: #b4fa70;">import</span> Parser, parser
+<span class="linenr"> 2: </span><span style="color: #b4fa70;">from</span> insights.parsers <span style="color: #b4fa70;">import</span> split_kv_pairs
+<span class="linenr"> 3: </span>
+<span class="linenr"> 4: </span>
+<span class="linenr"> 5: </span><span style="color: #8cc4ff;">@parser</span>(SosSpecs.lsb_release)
+<span class="linenr"> 6: </span><span style="color: #b4fa70;">class</span> <span style="color: #8cc4ff;">LsbRelease</span>(Parser):
+<span class="linenr"> 7: </span>    <span style="color: #b4fa70;">def</span> <span style="color: #fce94f;">parse_content</span>(<span style="color: #b4fa70;">self</span>, content):
+<span class="linenr"> 8: </span>        <span style="color: #fcaf3e;">_content</span> = split_kv_pairs(content)
+<span class="linenr"> 9: </span>        <span style="color: #b4fa70;">self</span>.data = {
+<span class="linenr">10: </span>            <span style="color: #e9b96e;">'product'</span>: _content[<span style="color: #e9b96e;">'DISTRIB_ID'</span>],
+<span class="linenr">11: </span>            <span style="color: #e9b96e;">'version'</span>: _content[<span style="color: #e9b96e;">'DISTRIB_RELEASE'</span>]
+<span class="linenr">12: </span>        }
+<span class="linenr">13: </span>
+<span class="linenr">14: </span>    @<span style="color: #e090d7;">property</span>
+<span class="linenr">15: </span>    <span style="color: #b4fa70;">def</span> <span style="color: #fce94f;">product</span>(<span style="color: #b4fa70;">self</span>):
+<span class="linenr">16: </span>        <span style="color: #b4fa70;">return</span> <span style="color: #b4fa70;">self</span>.data[<span style="color: #e9b96e;">'product'</span>]
+<span class="linenr">17: </span>
+<span class="linenr">18: </span>    @<span style="color: #e090d7;">property</span>
+<span class="linenr">19: </span>    <span style="color: #b4fa70;">def</span> <span style="color: #fce94f;">version</span>(<span style="color: #b4fa70;">self</span>):
+<span class="linenr">20: </span>        <span style="color: #b4fa70;">return</span> <span style="color: #b4fa70;">self</span>.data[<span style="color: #e9b96e;">'version'</span>]
+</pre>
+</div></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orga93bb66" class="outline-2">
+<h2 id="orga93bb66"><span class="section-number-2">6</span> Plugin/Rule</h2>
+<div class="outline-text-2" id="text-6">
+</div>
+<div id="outline-container-orgc664899" class="outline-3">
+<h3 id="orgc664899"><span class="section-number-3">6.1</span> Conditions<sup><a id="fnr.5" class="footref" href="#fn.5">5</a></sup></h3>
+<div class="outline-text-3" id="text-6-1">
+<ul class="org-ul">
+<li><p>
+<b>CODE</b>: Analyzing the data from the parser
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #e9b96e;">"""The (structured)data from the parsers is analyzed using the ``@condition`` &amp;</span>
+<span class="linenr"> 2: </span><span style="color: #e9b96e;">``@incident`` decorators. The function decorated with the ``@condition`` should</span>
+<span class="linenr"> 3: </span><span style="color: #e9b96e;">return the value which will be used by the ``@rule`` to finally bind all the</span>
+<span class="linenr"> 4: </span><span style="color: #e9b96e;">rule logic.</span>
+<span class="linenr"> 5: </span><span style="color: #e9b96e;">"""</span>
+<span class="linenr"> 6: </span><span style="color: #b4fa70;">from</span> insights.core.plugins <span style="color: #b4fa70;">import</span> condition
+<span class="linenr"> 7: </span><span style="color: #b4fa70;">from</span> insights.parsers.ssh <span style="color: #b4fa70;">import</span> SshDConfig
+<span class="linenr"> 8: </span><span style="color: #b4fa70;">from</span> insights.parsers.systemd.unitfiles <span style="color: #b4fa70;">import</span> ListUnits
+<span class="linenr"> 9: </span><span style="color: #b4fa70;">from</span> insights.parsers.redhat_release <span style="color: #b4fa70;">import</span> RedhatRelease
+<span class="linenr">10: </span>
+<span class="linenr">11: </span><span style="color: #8cc4ff;">@condition</span>(SshDConfig)
+<span class="linenr">12: </span><span style="color: #b4fa70;">def</span> <span style="color: #fce94f;">check_permit_root_login</span>(sshd):
+<span class="linenr">13: </span>    <span style="color: #e9b96e;">"""Return True if 'PermitRootLogin yes' in /etc/ssh/sshd_config.</span>
+<span class="linenr">14: </span><span style="color: #e9b96e;">    """</span>
+<span class="linenr">15: </span>    <span style="color: #b4fa70;">if</span> sshd.get(<span style="color: #e9b96e;">'permitrootlogin'</span>):
+<span class="linenr">16: </span>        <span style="color: #b4fa70;">return</span> sshd.get_values(<span style="color: #e9b96e;">'permitrootlogin'</span>)[0] == <span style="color: #e9b96e;">'yes'</span>
+<span class="linenr">17: </span>
+<span class="linenr">18: </span>
+<span class="linenr">19: </span><span style="color: #8cc4ff;">@condition</span>(ListUnits)
+<span class="linenr">20: </span><span style="color: #b4fa70;">def</span> <span style="color: #fce94f;">is_sshd_running</span>(units):
+<span class="linenr">21: </span>    <span style="color: #e9b96e;">""" Return True if ``sshd.service`` is running.</span>
+<span class="linenr">22: </span><span style="color: #e9b96e;">    """</span>
+<span class="linenr">23: </span>    <span style="color: #b4fa70;">return</span> units.is_running(<span style="color: #e9b96e;">'sshd.service'</span>) <span style="color: #b4fa70;">or</span> units.is_running(<span style="color: #e9b96e;">'ssh.service'</span>)
+<span class="linenr">24: </span>
+<span class="linenr">25: </span>
+<span class="linenr">26: </span><span style="color: #8cc4ff;">@condition</span>([RedhatRelease, LsbRelease])
+<span class="linenr">27: </span><span style="color: #b4fa70;">def</span> <span style="color: #fce94f;">get_release</span>(redhat_release, lsb_release):
+<span class="linenr">28: </span>    <span style="color: #e9b96e;">"""Return the product name.</span>
+<span class="linenr">29: </span>
+<span class="linenr">30: </span><span style="color: #e9b96e;">    RedhatRelease will parse the data from ``/etc/redhat-release``</span>
+<span class="linenr">31: </span><span style="color: #e9b96e;">    LsbRelease will parse the data from ``/etc/lsb-release``</span>
+<span class="linenr">32: </span><span style="color: #e9b96e;">    """</span>
+<span class="linenr">33: </span>    <span style="color: #b4fa70;">if</span> redhat_release:
+<span class="linenr">34: </span>        <span style="color: #b4fa70;">return</span> redhat_release.product
+<span class="linenr">35: </span>    <span style="color: #b4fa70;">if</span> lsb_release:
+<span class="linenr">36: </span>        <span style="color: #b4fa70;">return</span> lsb_release.product
+</pre>
+</div></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org91c33b6" class="outline-3">
+<h3 id="org91c33b6"><span class="section-number-3">6.2</span> The response<sup><a id="fnr.6" class="footref" href="#fn.6">6</a></sup></h3>
+<div class="outline-text-3" id="text-6-2">
+<ul class="org-ul">
+<li><p>
+<b>CODE</b>: The <code>@rule</code> will have a final logic which will decide the response of the
+plugin.
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #e9b96e;">"""The function decorated with the ``@rule`` decorator is where all the logic to</span>
+<span class="linenr"> 2: </span><span style="color: #e9b96e;">detect an issue exist. The logic for this rule is as follows:</span>
+<span class="linenr"> 3: </span>
+<span class="linenr"> 4: </span><span style="color: #e9b96e;">Logic:</span>
+<span class="linenr"> 5: </span><span style="color: #e9b96e;">1. check_permit_root_login</span>
+<span class="linenr"> 6: </span><span style="color: #e9b96e;">2. is_sshd_running</span>
+<span class="linenr"> 7: </span><span style="color: #e9b96e;">3. get_release</span>
+<span class="linenr"> 8: </span>
+<span class="linenr"> 9: </span><span style="color: #e9b96e;">if (2 &amp; 3):</span>
+<span class="linenr">10: </span><span style="color: #e9b96e;">    if 1:</span>
+<span class="linenr">11: </span><span style="color: #e9b96e;">        # The root user login is permitted</span>
+<span class="linenr">12: </span><span style="color: #e9b96e;">    # The root user login is disabled</span>
+<span class="linenr">13: </span>
+<span class="linenr">14: </span><span style="color: #e9b96e;">"""</span>
+<span class="linenr">15: </span><span style="color: #b4fa70;">from</span> insights.core.plugins <span style="color: #b4fa70;">import</span> make_fail, make_pass, rule
+<span class="linenr">16: </span>
+<span class="linenr">17: </span>
+<span class="linenr">18: </span><span style="color: #8cc4ff;">@rule</span>(check_permit_root_login, is_sshd_running, get_release)
+<span class="linenr">19: </span><span style="color: #b4fa70;">def</span> <span style="color: #fce94f;">report</span>(root_login, sshd, release):
+<span class="linenr">20: </span>    <span style="color: #b4fa70;">if</span> sshd <span style="color: #b4fa70;">and</span> release:
+<span class="linenr">21: </span>        <span style="color: #b4fa70;">if</span> root_login:
+<span class="linenr">22: </span>            <span style="color: #73d216;"># </span><span style="color: #73d216;">The issue is detected.</span>
+<span class="linenr">23: </span>            <span style="color: #b4fa70;">return</span> make_fail(<span style="color: #e9b96e;">'SSHD_ROOT_LOGIN_PERMITTED'</span>,
+<span class="linenr">24: </span>                             os=release)
+<span class="linenr">25: </span>        <span style="color: #73d216;"># </span><span style="color: #73d216;">The issue does not exist.</span>
+<span class="linenr">26: </span>        <span style="color: #b4fa70;">return</span> make_pass(<span style="color: #e9b96e;">'SSHD_ROOT_LOGIN_DISABLED'</span>,
+<span class="linenr">27: </span>                         os=release)
+<span class="linenr">28: </span>
+</pre>
+</div></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org831def8" class="outline-3">
+<h3 id="org831def8"><span class="section-number-3">6.3</span> Embedded content<sup><a id="fnr.7" class="footref" href="#fn.7">7</a></sup></h3>
+<div class="outline-text-3" id="text-6-3">
+<ul class="org-ul">
+<li><p>
+<b>CODE</b> Use the <code>CONTENT</code> attribute to render the response
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr"> 1: </span><span style="color: #fcaf3e;">fail_message</span> = <span style="color: #e9b96e;">"""</span>
+<span class="linenr"> 2: </span><span style="color: #e9b96e;">The root user can login on this {{os}} host because the 'PermitRootLogin' is set</span>
+<span class="linenr"> 3: </span><span style="color: #e9b96e;">to 'yes' in /etc/ssh/sshd_config.</span>
+<span class="linenr"> 4: </span>
+<span class="linenr"> 5: </span><span style="color: #e9b96e;">It is recommended to set 'PermitRootLogin' to 'prohibit-password',</span>
+<span class="linenr"> 6: </span><span style="color: #e9b96e;">'forced-commands-only' or 'no'.</span>
+<span class="linenr"> 7: </span>
+<span class="linenr"> 8: </span><span style="color: #e9b96e;">Please refer the manpage of SSHD_CONFIG for more info:</span>
+<span class="linenr"> 9: </span><span style="color: #e9b96e;">$ man 5 ssh_config</span>
+<span class="linenr">10: </span><span style="color: #e9b96e;">"""</span>
+<span class="linenr">11: </span>
+<span class="linenr">12: </span><span style="color: #fcaf3e;">pass_message</span> = <span style="color: #e9b96e;">"""</span>
+<span class="linenr">13: </span><span style="color: #e9b96e;">The root user cannot login on this {{os}} host.</span>
+<span class="linenr">14: </span><span style="color: #e9b96e;">"""</span>
+<span class="linenr">15: </span>
+<span class="linenr">16: </span><span style="color: #fcaf3e;">CONTENT</span> = {
+<span class="linenr">17: </span>    <span style="color: #e9b96e;">'SSHD_ROOT_LOGIN_PERMITTED'</span>: fail_message,
+<span class="linenr">18: </span>    <span style="color: #e9b96e;">'SSHD_ROOT_LOGIN_DISABLED'</span>: pass_message
+<span class="linenr">19: </span>}
+</pre>
+</div></li>
+</ul>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org8eda917" class="outline-2">
+<h2 id="org8eda917"><span class="section-number-2">7</span> Investigating the sos-report<sup><a id="fnr.8" class="footref" href="#fn.8">8</a></sup></h2>
+<div class="outline-text-2" id="text-7">
+<ul class="org-ul">
+<li><p>
+Run the plugin against the sos-report using:
+</p>
+<div class="org-src-container">
+<pre class="src src-shell">$ insights-run -p my_plugin.py /path/to/sos-report.tar.xz
+</pre>
+</div></li>
+
+<li><p>
+Sample output
+</p>
+<div class="org-src-container">
+<pre class="src src-text"><span class="linenr"> 1: </span>$ insights-run -p check_ssh_root_login.py sosreport_fedora_sshd_root_login.tar.xz
+<span class="linenr"> 2: </span>---------
+<span class="linenr"> 3: </span>Progress:
+<span class="linenr"> 4: </span>---------
+<span class="linenr"> 5: </span>F
+<span class="linenr"> 6: </span>
+<span class="linenr"> 7: </span>--------------
+<span class="linenr"> 8: </span>Rules Executed
+<span class="linenr"> 9: </span>--------------
+<span class="linenr">10: </span>[FAIL] check_ssh_root_login.report
+<span class="linenr">11: </span>----------------------------------
+<span class="linenr">12: </span>
+<span class="linenr">13: </span>The root user can login on this Fedora host because the 'PermitRootLogin' is set
+<span class="linenr">14: </span>to 'yes' in /etc/ssh/sshd_config.
+<span class="linenr">15: </span>
+<span class="linenr">16: </span>It is recommended to set 'PermitRootLogin' to 'prohibit-password',
+<span class="linenr">17: </span>'forced-commands-only' or 'no'.
+<span class="linenr">18: </span>
+<span class="linenr">19: </span>Please refer the manpage of SSHD_CONFIG for more info:
+<span class="linenr">20: </span>$ man 5 ssh_config
+<span class="linenr">21: </span>
+<span class="linenr">22: </span>
+<span class="linenr">23: </span>----------------------
+<span class="linenr">24: </span>Rule Execution Summary
+<span class="linenr">25: </span>----------------------
+<span class="linenr">26: </span>Passed      : 0
+<span class="linenr">27: </span>Failed      : 1
+<span class="linenr">28: </span>Info        : 0
+<span class="linenr">29: </span>Missing Deps: 0
+<span class="linenr">30: </span>Fingerprint : 0
+<span class="linenr">31: </span>Metadata    : 0
+<span class="linenr">32: </span>Metadata Key: 0
+<span class="linenr">33: </span>Exceptions  : 0
+</pre>
+</div></li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-org626ec10" class="outline-2">
+<h2 id="org626ec10"><span class="section-number-2">8</span> [WIP]Debugging<sup><a id="fnr.9" class="footref" href="#fn.9">9</a></sup></h2>
+<div class="outline-text-2" id="text-8">
+<ul class="org-ul">
+<li><p>
+Specs
+</p>
+<div class="org-src-container">
+<pre class="src src-shell"><span class="linenr"> 1: </span>$ insights-inspect insights.specs.default.DefaultSpecs.redhat_release sosreport_<span style="color: #ee82ee; background-color: #333333;">xxx.tar.xz</span>
+<span class="linenr"> 2: </span>
+<span class="linenr"> 3: </span>IPython Console Usage Info:
+<span class="linenr"> 4: </span>
+<span class="linenr"> 5: </span>Enter <span style="color: #e9b96e;">'redhat_release.'</span> and tab to get a list of properties
+<span class="linenr"> 6: </span>Example:
+<span class="linenr"> 7: </span>In [1]: redhat_release.&lt;property_name&gt;
+<span class="linenr"> 8: </span>Out[1]: &lt;property value&gt;
+<span class="linenr"> 9: </span>
+<span class="linenr">10: </span>To exit ipython enter <span style="color: #e9b96e;">'exit'</span> and hit enter or use <span style="color: #e9b96e;">'CTL D'</span>
+<span class="linenr">11: </span>
+<span class="linenr">12: </span>Starting IPython Interpreter Now
+<span class="linenr">13: </span>
+<span class="linenr">14: </span>In [1]: redhat_release.content
+<span class="linenr">15: </span>Out[1]: [<span style="color: #e9b96e;">'Fedora release 29 (Twenty Nine)'</span>]
+<span class="linenr">16: </span>
+<span class="linenr">17: </span>In [2]: redhat_release.path
+<span class="linenr">18: </span>Out[2]: <span style="color: #e9b96e;">'/tmp/insights-rdhi53c6/sosreport_fedora_sshd_root_login/etc/redhat-rele</span><span style="color: #ee82ee; background-color: #333333;">ase'</span>
+<span class="linenr">19: </span>
+<span class="linenr">20: </span>In [3]: redhat_release.file_name
+<span class="linenr">21: </span>Out[3]: <span style="color: #e9b96e;">'redhat-release'</span>
+</pre>
+</div></li>
+
+<li><p>
+Parser:
+</p>
+<div class="org-src-container">
+<pre class="src src-shell"><span class="linenr"> 1: </span>$ insights-inspect insights.parsers.redhat_release.RedhatRelease sosreport_xxx.t<span style="color: #ee82ee; background-color: #333333;">ar.xz</span>
+<span class="linenr"> 2: </span>
+<span class="linenr"> 3: </span>IPython Console Usage Info:
+<span class="linenr"> 4: </span>
+<span class="linenr"> 5: </span>Enter <span style="color: #e9b96e;">'RedhatRelease.'</span> and tab to get a list of properties
+<span class="linenr"> 6: </span>Example:
+<span class="linenr"> 7: </span>In [1]: RedhatRelease.&lt;property_name&gt;
+<span class="linenr"> 8: </span>Out[1]: &lt;property value&gt;
+<span class="linenr"> 9: </span>
+<span class="linenr">10: </span>To exit ipython enter <span style="color: #e9b96e;">'exit'</span> and hit enter or use <span style="color: #e9b96e;">'CTL D'</span>
+<span class="linenr">11: </span>
+<span class="linenr">12: </span>Starting IPython Interpreter Now
+<span class="linenr">13: </span>
+<span class="linenr">14: </span>In [1]: RedhatRelease.raw
+<span class="linenr">15: </span>Out[1]: <span style="color: #e9b96e;">'Fedora release 29 (Twenty Nine)'</span>
+<span class="linenr">16: </span>
+<span class="linenr">17: </span>In [2]: RedhatRelease.parsed
+<span class="linenr">18: </span>Out[2]: {<span style="color: #e9b96e;">'product'</span>: <span style="color: #e9b96e;">'Fedora'</span>, <span style="color: #e9b96e;">'version'</span>: <span style="color: #e9b96e;">'29'</span>, <span style="color: #e9b96e;">'code_name'</span>: <span style="color: #e9b96e;">'Twenty Nine'</span>}
+<span class="linenr">19: </span>
+<span class="linenr">20: </span>In [3]: RedhatRelease.product
+<span class="linenr">21: </span>Out[3]: <span style="color: #e9b96e;">'Fedora'</span>
+<span class="linenr">22: </span>
+<span class="linenr">23: </span>In [4]: RedhatRelease.version
+<span class="linenr">24: </span>Out[4]: <span style="color: #e9b96e;">'29'</span>
+</pre>
+</div></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgf623edd" class="outline-2">
+<h2 id="orgf623edd"><span class="section-number-2">9</span> End<sup><a id="fnr.10" class="footref" href="#fn.10">10</a></sup><sup>, </sup><sup><a id="fnr.11" class="footref" href="#fn.11">11</a></sup><sup>, </sup><sup><a id="fnr.12" class="footref" href="#fn.12">12</a></sup></h2>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> <div class="footpara"><p class="footpara">
+<a href="https://git-scm.com/book/en/v2">https://git-scm.com/book/en/v2</a>
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2">2</a></sup> <div class="footpara"><p class="footpara">
+<a href="https://github.com/sosreport/sos/wiki#for-users">https://github.com/sosreport/sos/wiki#for-users</a>
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3">3</a></sup> <div class="footpara"><p class="footpara">
+<a href="https://insights-core.readthedocs.io/en/latest/api.html#specification-factories">https://insights-core.readthedocs.io/en/latest/api.html#specification-factories</a>
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.4" class="footnum" href="#fnr.4">4</a></sup> <div class="footpara"><p class="footpara">
+<a href="https://insights-core.readthedocs.io/en/latest/api.html#parsers">https://insights-core.readthedocs.io/en/latest/api.html#parsers</a>
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.5" class="footnum" href="#fnr.5">5</a></sup> <div class="footpara"><p class="footpara">
+<a href="https://insights-core.readthedocs.io/en/latest/api_index.html?highlight=@condition#insights.core.plugins.condition">https://insights-core.readthedocs.io/en/latest/api_index.html?highlight=@condition#insights.core.plugins.condition</a>
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.6" class="footnum" href="#fnr.6">6</a></sup> <div class="footpara"><p class="footpara">
+<a href="https://insights-core.readthedocs.io/en/latest/api.html?highlight=@rule#rule-plugins">https://insights-core.readthedocs.io/en/latest/api.html?highlight=@rule#rule-plugins</a>
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.7" class="footnum" href="#fnr.7">7</a></sup> <div class="footpara"><p class="footpara">
+<a href="https://insights-core.readthedocs.io/en/latest/embedded_content.html">https://insights-core.readthedocs.io/en/latest/embedded_content.html</a>
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.8" class="footnum" href="#fnr.8">8</a></sup> <div class="footpara"><p class="footpara">
+<a href="https://insights-core.readthedocs.io/en/latest/manpages/insights-run.html">https://insights-core.readthedocs.io/en/latest/manpages/insights-run.html</a>
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.9" class="footnum" href="#fnr.9">9</a></sup> <div class="footpara"><p class="footpara">
+<a href="https://insights-core.readthedocs.io/en/latest/manpages/insights-inspect.html">https://insights-core.readthedocs.io/en/latest/manpages/insights-inspect.html</a>
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.10" class="footnum" href="#fnr.10">10</a></sup> <div class="footpara"><p class="footpara">
+Made with Love, LaTeX and GNU Emacs.
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.11" class="footnum" href="#fnr.11">11</a></sup> <div class="footpara"><p class="footpara">
+The code snippets are tested on <i>Fedora 29</i> &amp; <i>Ubuntu 10.04</i>.
+</p></div></div>
+
+<div class="footdef"><sup><a id="fn.12" class="footnum" href="#fnr.12">12</a></sup> <div class="footpara"><p class="footpara">
+For Education purpose only.
+</p></div></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+<p class="date">Date: DevConf.in 2019, Bangalore, India</p>
+<p class="author">Author: Sachin Patil, Vishwanath Jadhav</p>
+<p class="email">Email: <a href="mailto:psachin@redhat.com">psachin@redhat.com</a>, <a href="mailto:vjadhav@redhat.com">vjadhav@redhat.com</a></p>
+<p class="date">Created: 2019-09-16 Mon 14:54</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
