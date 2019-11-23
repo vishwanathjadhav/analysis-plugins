@@ -102,7 +102,8 @@ function setup_gss_rules() {
 	echo "==============="
 	cd ${INSIGHTS_WKSP}
 	git clone git@gitlab.cee.redhat.com:support-insights/gss-rules.git
-	if [ $? -ne 0 ]; then
+	result="$?"
+	if [ "$result" -ne 0 ];then
 		echo "===================================="
 		echo "WARNING: Please check ssh permission"
 		echo "Generate ssh key, press enter"
@@ -131,7 +132,8 @@ function test_insights_core() {
 	sudo chown insights:insights -R .
 	sudo chown insights:insights -R ${INSIGHTS_ENV}
 	py.test .
-	if [ -z $? ];then
+	result="$?"
+	if [ "$result" -ne 0 ];then
 		echo "SUCESS: Insights core framework setup done"
 	else
 		echo "ERROR: Insights core framework setup failed"
@@ -149,8 +151,8 @@ function test_gss_rules() {
 	pip install -e .[develop]
 	cd ${GSS_RULES}
 	py.test .
-	resutlt="$?"
-	if [ "$result" -eq 0 ];then
+	result="$?"
+	if [ "$result" -eq 0 ]; then
 		echo "==================================="
 		echo "             SUCESS                "
 		echo "==================================="
